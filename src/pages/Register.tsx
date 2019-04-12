@@ -5,7 +5,7 @@ import { withRouter, RouteComponentProps, Redirect } from 'react-router-dom';
 import firebaseApp from '../firebase';
 import AuthForm, { FormFields, FormErrors } from '../components/AuthForm';
 import AuthModal from '../components/AuthModal';
-import AuthHeader from '../components/AuthHeader';
+import AuthHeader from '../components/Header';
 
 interface RegisterProps extends RouteComponentProps {
   authenticated: boolean;

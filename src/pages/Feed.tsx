@@ -1,9 +1,10 @@
 import React, { Component, StatelessComponent } from 'react';
 import { Button } from 'react-bootstrap';
-import firebaseApp from '../firebase';
 import Parser from 'rss-parser';
 
+import firebaseApp from '../firebase';
 import Spinner from '../components/Spinner';
+import Header from '../components/Header';
 
 const parser = new Parser({
   customFields: {
@@ -11,19 +12,66 @@ const parser = new Parser({
   }
 });
 
-
 type FeedProps = {
   rssFeed: Parser.Output | undefined;
-  mostFrequentWords: string[];
+  mostFrequentWords: Array<[string, number]>;
   loading: boolean;
   error: boolean;
 }
 
+const mostCommonWordsInEnglish = [
+  "the",
+  "be",
+  "to",
+  "of",
+  "and",
+  "a",
+  "in",
+  "that",
+  "have",
+  "i",
+  "it",
+  "for",
+  "not",
+  "on",
+  "with",
+  "he",
+  "as",
+  "you",
+  "do",
+  "at",
+  "this",
+  "but",
+  "his",
+  "by",
+  "from",
+  "they",
+  "we",
+  "say",
+  "her",
+  "she",
+  "or",
+  "an",
+  "will",
+  "my",
+  "one",
+  "all",
+  "would",
+  "there",
+  "their",
+  "what",
+  "so",
+  "up",
+  "out",
+  "if",
+  "about",
+  "who",
+  "get",
+  "which",
+  "go",
+  "me"
+];
 
-const countOccurrencies = (words: string[]) => words.reduce(function(wordCounts, cur) {
-  wordCounts[cur] = (wordCounts[cur] || 0) + 1;
-  return wordCounts;
-}, {} as Record<string, number>);
 
 const getMostFrequentWords = (items: Parser.Item[] = []) => items.reduce((toCount, item) => {
     // we take only title & summary
@@ -31,6 +79,31 @@ const getMostFrequentWords = (items: Parser.Item[] = []) => items.reduce((toCoun
     const summaryWords = item.summary._.replace(/<\/?[^>]+(>|$)/g, "").toLowerCase().match(/\b['?-?(\w+)?]+\b/gi);
     return toCount.concat(titleWords ? titleWords : [], summaryWords);
   }, [] as string[]);
+
+const countOccurrencies = (words: string[]) => words.reduce(function(wordCounts, cur) {
+    wordCounts[cur] = (wordCounts[cur] || 0) + 1;
+    return wordCounts;
+  }, {} as Record<string, number>);
+
+const filterOutMostCommonWords = (wordCount: Record<string, number>) => {
+  for (const commonWord of mostCommonWordsInEnglish) {
+    if (commonWord in wordCount) {
+      delete wordCount[commonWord];
+    }
+  }
+  return wordCount;
+}
+
+const sortDescendingly = (wordCount: Record<string, number>) => {
+  let wordCountMap: Array<[string, number]> = [];
+  for (const word in wordCount) {
+    wordCountMap.push([word, wordCount[word]]);
+  };
+
+  return wordCountMap.sort((a, b) => {
+    return b[1] - a[1];
+  });
+};
 
 class Feed extends Component<{}, FeedProps> {
   constructor(props: {}) {
@@ -46,11 +119,11 @@ class Feed extends Component<{}, FeedProps> {
   componentDidMount = async () => {
     try {
       const rssFeed = await parser.parseURL('https://cors-anywhere.herokuapp.com/https://www.theregister.co.uk/software/headlines.atom');
-      const mostFrequentWords = getMostFrequentWords(rssFeed.items);
-      console.log("YO", mostFrequentWords);
+      const mostFrequentWords = sortDescendingly(filterOutMostCommonWords(countOccurrencies(getMostFrequentWords(rssFeed.items))));
+
       this.setState({
         rssFeed: rssFeed,
-        mostFrequentWords: [],
+        mostFrequentWords: mostFrequentWords.slice(0, 10),
         loading: false,
         error: false,
       });
@@ -71,7 +144,12 @@ class Feed extends Component<{}, FeedProps> {
   };
 
   render() {
-    if (this.state.loading) {
+    const {
+      loading,
+      mostFrequentWords,
+      rssFeed,
+    } = this.state;
+    if (loading) {
       return <Spinner />;
     }
 
@@ -82,10 +160,17 @@ class Feed extends Component<{}, FeedProps> {
             Log out
           </Button>
         </div>
+        <Header />
+        <div className="feed__frequent-words">
+          <h4>Most frequent words in these articles: </h4>
+          <ul>
+            {mostFrequentWords.map(word => <li key={word[0]}><b>{word[0]}</b>: showed up <b>{word[1]}</b> times</li>)}
+          </ul>
+        </div>
         <div>
-          {this.state.rssFeed
-            && this.state.rssFeed.items
-            && this.state.rssFeed.items.map(item => <FeedItem item={item} key={item.id} />)}
+          {rssFeed
+            && rssFeed.items
+            && rssFeed.items.map(item => <FeedItem item={item} key={item.id} />)}
         </div>
       </div>
     );
