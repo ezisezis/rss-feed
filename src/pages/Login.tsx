@@ -2,21 +2,21 @@ import React, { Component } from 'react';
 import { FormikActions } from 'formik';
 import { withRouter, RouteComponentProps, Redirect } from 'react-router-dom';
 
-import firebaseApp from './firebase';
-import AuthForm, { FormFields, FormErrors } from './AuthForm';
-import AuthModal from './AuthModal';
-import AuthHeader from './AuthHeader';
+import firebaseApp from '../firebase';
+import AuthForm, { FormFields, FormErrors } from '../components/AuthForm';
+import AuthModal from '../components/AuthModal';
+import AuthHeader from '../components/AuthHeader';
 
-interface RegisterProps extends RouteComponentProps {
+interface LoginProps extends RouteComponentProps {
   authenticated: boolean;
 };
 
-type RegisterState = {
+type LoginState = {
   errorMessage: string;
 };
 
-class Register extends Component<RegisterProps, RegisterState> {
-  constructor(props: RegisterProps) {
+class Login extends Component<LoginProps, LoginState> {
+  constructor(props: LoginProps) {
     super(props);
 
     this.state = {
@@ -39,7 +39,7 @@ class Register extends Component<RegisterProps, RegisterState> {
     return errors;
   };
 
-  onRegister = async (
+  onLogin = async (
     values: FormFields,
     formActions: FormikActions<FormFields>
   ) => {
@@ -47,7 +47,7 @@ class Register extends Component<RegisterProps, RegisterState> {
       formActions.setSubmitting(true);
       await firebaseApp
         .auth()
-        .createUserWithEmailAndPassword(values.email, values.password);
+        .signInWithEmailAndPassword(values.email, values.password);
       this.props.history.push('/feed');
     } catch (error) {
       this.setState({
@@ -58,7 +58,7 @@ class Register extends Component<RegisterProps, RegisterState> {
     }
   };
 
-  goToLogin = () => this.props.history.push('/login');
+  goToRegistration = () => this.props.history.push('/register');
 
   onModalClose = () =>
     this.setState({
@@ -74,19 +74,19 @@ class Register extends Component<RegisterProps, RegisterState> {
       <div className="auth">
         <AuthHeader />
         <AuthForm
-          buttonLabel="Register"
-          onSubmit={this.onRegister}
+          buttonLabel="Login"
+          onSubmit={this.onLogin}
           onValidate={this.onValidate} />
         <AuthModal
-          title="Error registering!"
+          title="Error logging in!"
           body={this.state.errorMessage}
           show={!!this.state.errorMessage}
           onClose={this.onModalClose}
         />
         <div>
-          Already registered?{' '}
-          <a onClick={this.goToLogin} className="auth__link">
-            Log in.
+          Don't have an account yet?{' '}
+          <a onClick={this.goToRegistration} className="auth__link">
+            Register.
           </a>
         </div>
       </div>
@@ -94,4 +94,4 @@ class Register extends Component<RegisterProps, RegisterState> {
   }
 }
 
-export default withRouter(Register);
+export default withRouter(Login);

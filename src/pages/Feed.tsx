@@ -1,9 +1,9 @@
 import React, { Component, StatelessComponent } from 'react';
 import { Button } from 'react-bootstrap';
-import firebaseApp from './firebase';
+import firebaseApp from '../firebase';
 import Parser from 'rss-parser';
 
-import Spinner from './Spinner';
+import Spinner from '../components/Spinner';
 
 const parser = new Parser({
   customFields: {

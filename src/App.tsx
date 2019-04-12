@@ -8,11 +8,11 @@ import {
 } from 'react-router-dom';
 import firebase from 'firebase/app';
 
-import Login from './Login';
-import Register from './Register';
-import Feed from './Feed';
-import NotFound from './NotFound';
-import Spinner from './Spinner';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Feed from './pages/Feed';
+import NotFound from './pages/NotFound';
+import Spinner from './components/Spinner';
 import firebaseApp from './firebase';
 
 type AppState = {
