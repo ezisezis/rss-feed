@@ -3,7 +3,7 @@ import { FormikActions } from 'formik';
 import { withRouter, RouteComponentProps, Redirect } from 'react-router-dom';
 
 import firebaseApp from '../firebase';
-import AuthForm, { FormFields, FormErrors } from '../components/AuthForm';
+import AuthForm, { FormFields } from '../components/AuthForm';
 import AuthModal from '../components/AuthModal';
 import AuthHeader from '../components/Header';
 
@@ -24,20 +24,25 @@ class Login extends Component<LoginProps, LoginState> {
     };
   }
 
-  onValidate = (values: FormFields) => {
-    let errors: FormErrors = {};
-    if (!values.email) {
-      errors.email = 'E-mail is required';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
-      errors.email = 'Invalid e-mail address';
+  validateEmail = (email: string) => {
+    if (!email) {
+      return 'E-mail is required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
+      return 'Invalid e-mail address';
     }
-    if (!values.password) {
-      errors.password = 'Password is required';
-    } else if (values.password.length < 6) {
-      errors.password = 'Password too short';
+
+    return '';
+  }
+
+  validatePassword = (password: string) => {
+    if (!password) {
+      return 'Password is required';
+    } else if (password.length < 8) {
+      return 'Password too short';
     }
-    return errors;
-  };
+
+    return '';
+  }
 
   onLogin = async (
     values: FormFields,
@@ -76,7 +81,9 @@ class Login extends Component<LoginProps, LoginState> {
         <AuthForm
           buttonLabel="Login"
           onSubmit={this.onLogin}
-          onValidate={this.onValidate} />
+          onValidateEmail={this.validateEmail}
+          onValidatePassword={this.validatePassword}
+        />
         <AuthModal
           title="Error logging in!"
           body={this.state.errorMessage}

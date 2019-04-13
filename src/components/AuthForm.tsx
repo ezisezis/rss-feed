@@ -4,33 +4,38 @@ import { Formik, Form, Field, ErrorMessage, FormikState, FormikActions } from 'f
 
 interface InnerFormProps extends FormikState<FormFields> {
   buttonLabel: string;
+  onValidateEmail: (email: string) => string | Promise<string>;
+  onValidatePassword: (password: string) => string;
 }
 
 export type FormFields = {
     email: string;
     password: string;
 };
-  
+
 export type FormErrors = {
     email?: string;
     password?: string;
 };
  
 type AuthFormProps = {
-    onValidate: (values: FormFields) => FormErrors;
+    onValidateEmail: (email: string) => string | Promise<string>;
+    onValidatePassword: (password: string) => string;
     onSubmit: (values: FormFields, formActions: FormikActions<FormFields>) => Promise<void>;
     buttonLabel: string;
 }
 
 const InnerForm: StatelessComponent<InnerFormProps> = ({
+  onValidateEmail,
+  onValidatePassword,
   buttonLabel,
   isSubmitting,
   errors
 }) => (
   <Form className="auth__form">
-    <Field type="email" name="email" placeholder="E-mail" />
+    <Field type="email" name="email" placeholder="E-mail" validate={onValidateEmail} />
     <ErrorMessage name="email">{msg => <div className="auth__form__error">{msg}</div>}</ErrorMessage>
-    <Field type="password" name="password" placeholder="Password" />
+    <Field type="password" name="password" placeholder="Password" validate={onValidatePassword} />
     <ErrorMessage name="password">{msg => <div className="auth__form__error">{msg}</div>}</ErrorMessage>
     <Button
       type="submit"
@@ -48,18 +53,22 @@ class AuthForm extends PureComponent<AuthFormProps> {
             password: ''
         };
         const {
-            onValidate,
+            onValidateEmail,
+            onValidatePassword,
             onSubmit,
             buttonLabel,
         } = this.props;
 
         return (<Formik
             initialValues={initialValues}
-            validate={onValidate}
             onSubmit={onSubmit}
           >
             {(formState: FormikState<FormFields>) => (
-              <InnerForm {...formState} buttonLabel={buttonLabel} />
+              <InnerForm
+                {...formState}
+                buttonLabel={buttonLabel}
+                onValidateEmail={onValidateEmail}
+                onValidatePassword={onValidatePassword} />
             )}
           </Formik>)
     }

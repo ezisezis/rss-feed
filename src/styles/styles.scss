@@ -1,9 +1,9 @@
-$lightblueColor: #78C8C7;
-$formItemHeight: 36px;
-$fieldBorder: 1px solid #d4cece;
-$fieldBorderRadius: 5px;
-
 @import url('https://fonts.googleapis.com/css?family=Lato:300&subset=latin-ext');
+@import './consts.scss';
+@import './feed.scss';
+@import './spinner.scss';
+@import './error.scss';
+@import './auth.scss';
 
 body,
 html {
@@ -30,76 +30,6 @@ html {
       background-color: #4f807f;
       border: $fieldBorder;
       border-radius: $fieldBorderRadius;
-    }
-  }
-}
-
-.spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-
-  &__dot {
-    text-align: center;
-  }
-}
-
-.auth {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  flex-direction: column;
-
-  &__header {
-    margin-bottom: 24px;
-    text-align: center;
-  }
-
-  &__title {
-    font-size: 60px;
-  }
-
-  &__form {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    width: 264px;
-
-    input {
-      margin-bottom: 24px;
-      border: $fieldBorder;
-      border-radius: $fieldBorderRadius;
-      height: $formItemHeight;
-      padding: 0 12px;
-    }
-
-    &__error {
-      margin-top: -24px;
-      color: red;
-    }
-  }
-
-  &__link {
-    cursor: pointer;
-    text-decoration: underline !important;
-  }
-}
-
-.feed {
-  margin: 30px;
-
-  &__logout {
-    text-align:right;
-    width:100%;
-  }
-
-  &__item {
-    margin-bottom: 40px;
-
-    h4 {
-      font-size: 16px;
     }
   }
 }
